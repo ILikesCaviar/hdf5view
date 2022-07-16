@@ -2,23 +2,25 @@
 
 import h5py
 
-from qtpy.QtCore import (
+from PyQt6.QtCore import (
     QAbstractTableModel,
     QModelIndex,
     Qt,
 )
 
-from qtpy.QtGui import (
+from PyQt6.QtGui import (
     QBrush,
     QIcon,
     QStandardItem,
     QStandardItemModel,
 )
 
-from qtpy.QtWidgets import (
+from PyQt6.QtWidgets import (
     QComboBox,
     QStyledItemDelegate,
 )
+
+from hdf5view.utility import resource_path
 
 
 class TreeModel(QStandardItemModel):
@@ -43,7 +45,7 @@ class TreeModel(QStandardItemModel):
             node_name = node_path
 
         tree_item = QStandardItem(node_name)
-        tree_item.setData(node_path, Qt.UserRole)
+        tree_item.setData(node_path, Qt.ItemDataRole.UserRole)
         tree_item.setToolTip(node_path)
 
         num_attrs = len(node.attrs)
@@ -52,17 +54,17 @@ class TreeModel(QStandardItemModel):
         else:
             attrs_item = QStandardItem('')
 
-        attrs_item.setForeground(QBrush((Qt.darkGray)))
+        attrs_item.setForeground(QBrush((Qt.GlobalColor.darkGray)))
 
         if isinstance(node, h5py.Dataset):
-            tree_item.setIcon(QIcon(':/images/dataset.svg'))
+            tree_item.setIcon(QIcon(resource_path('images/dataset.svg')))
             dataset_item = QStandardItem(str(node.shape))
 
         elif isinstance(node, h5py.Group):
-            tree_item.setIcon(QIcon(':/images/folder.svg'))
+            tree_item.setIcon(QIcon(resource_path('images/folder.svg')))
             dataset_item = QStandardItem('')
 
-        dataset_item.setForeground(QBrush((Qt.darkGray)))
+        dataset_item.setForeground(QBrush((Qt.GlobalColor.darkGray)))
 
         parent_item.appendRow([tree_item, attrs_item, dataset_item])
         return tree_item
@@ -76,7 +78,7 @@ class TreeModel(QStandardItemModel):
         if not item.hasChildren():
             return
 
-        item.setIcon(QIcon(':/images/folder-open.svg'))
+        item.setIcon(QIcon(resource_path('images/folder-open.svg')))
 
         for row in range(item.rowCount()):
             child_item = item.child(row, 0)
@@ -84,7 +86,7 @@ class TreeModel(QStandardItemModel):
             if not child_item or child_item.hasChildren():
                 continue
 
-            path = child_item.data(Qt.UserRole)
+            path = child_item.data(Qt.ItemDataRole.UserRole)
             child_node = self.hdf[path]
 
             if isinstance(child_node, h5py.Group):
@@ -96,7 +98,7 @@ class TreeModel(QStandardItemModel):
         Update the icon when collapsing a group
         """
         item = self.itemFromIndex(index)
-        item.setIcon(QIcon(':/images/folder.svg'))
+        item.setIcon(QIcon(resource_path('images/folder.svg')))
 
 
 class AttributesTableModel(QAbstractTableModel):
@@ -131,19 +133,19 @@ class AttributesTableModel(QAbstractTableModel):
         return self.column_count
 
     def headerData(self, section, orientation, role):
-        if role == Qt.DisplayRole:
-            if orientation == Qt.Horizontal:
+        if role == Qt.ItemDataRole.DisplayRole:
+            if orientation == Qt.Orientation.Horizontal:
                 return self.HEADERS[section]
             else:
                 return str(section)
 
-    def data(self, index, role=Qt.DisplayRole):
+    def data(self, index, role=Qt.ItemDataRole.DisplayRole):
 
         if index.isValid():
             column = index.column()
             row = index.row()
 
-            if role in (Qt.DisplayRole, Qt.ToolTipRole):
+            if role in (Qt.ItemDataRole.DisplayRole, Qt.ItemDataRole.ToolTipRole):
                 if column == 0:
                     return self.keys[row]
                 elif column == 1:
@@ -197,19 +199,19 @@ class DatasetTableModel(QAbstractTableModel):
         return self.column_count
 
     def headerData(self, section, orientation, role):
-        if role == Qt.DisplayRole:
-            if orientation == Qt.Horizontal:
+        if role == Qt.ItemDataRole.DisplayRole:
+            if orientation == Qt.Orientation.Horizontal:
                 return self.HEADERS[section]
             else:
                 return str(section)
 
-    def data(self, index, role=Qt.DisplayRole):
+    def data(self, index, role=Qt.ItemDataRole.DisplayRole):
 
         if index.isValid():
             column = index.column()
             row = index.row()
 
-            if role in (Qt.DisplayRole, Qt.ToolTipRole):
+            if role in (Qt.ItemDataRole.DisplayRole, Qt.ItemDataRole.ToolTipRole):
                 if column == 0:
                     return self.keys[row]
                 elif column == 1:
@@ -279,18 +281,18 @@ class DataTableModel(QAbstractTableModel):
         return self.column_count
 
     def headerData(self, section, orientation, role):
-        if role == Qt.DisplayRole:
-            if self.compound_names and orientation == Qt.Horizontal:
+        if role == Qt.ItemDataRole.DisplayRole:
+            if self.compound_names and orientation == Qt.Orientation.Horizontal:
                 return self.compound_names[section]
             else:
                 return str(section)
 
         super().headerData(section, orientation, role)
 
-    def data(self, index, role=Qt.DisplayRole):
+    def data(self, index, role=Qt.ItemDataRole.DisplayRole):
 
         if index.isValid():
-            if role in (Qt.DisplayRole, Qt.ToolTipRole):
+            if role in (Qt.ItemDataRole.DisplayRole, Qt.ItemDataRole.ToolTipRole):
                 if self.ndim == 1:
                     if self.compound_names:
                         name = self.compound_names[index.column()]
@@ -381,25 +383,25 @@ class DimsTableModel(QAbstractTableModel):
         return self.column_count
 
     def headerData(self, section, orientation, role):
-        if role == Qt.DisplayRole:
+        if role == Qt.ItemDataRole.DisplayRole:
             return str(section)
 
-    def data(self, index, role=Qt.DisplayRole):
+    def data(self, index, role=Qt.ItemDataRole.DisplayRole):
         if index.isValid():
-            if role == Qt.DisplayRole:
+            if role == Qt.ItemDataRole.DisplayRole:
                 return self.shape[index.column()]
 
-            elif role == Qt.TextAlignmentRole:
-                return Qt.AlignCenter
+            elif role == Qt.ItemDataRole.TextAlignmentRole:
+                return Qt.AlignmentFlag.AlignCenter
 
     def flags(self, index):
         flags = super().flags(index)
-        flags |= Qt.ItemIsEditable
+        flags |= Qt.ItemFlag.ItemIsEditable
         return flags
 
     def setData(self, index, value, role):
 
-        if index.isValid() and role == Qt.EditRole:
+        if index.isValid() and role == Qt.ItemDataRole.EditRole:
             column = index.column()
             value = value.strip()
 
@@ -443,7 +445,7 @@ class ComboBoxItemDelegate(QStyledItemDelegate):
 
         # Get the index of the text in the combobox that
         # matches the current value of the item
-        currentText = index.data(Qt.DisplayRole)
+        currentText = index.data(Qt.ItemDataRole.DisplayRole)
         cbIndex = cb.findText(currentText)
 
         if cbIndex != -1:
@@ -451,4 +453,4 @@ class ComboBoxItemDelegate(QStyledItemDelegate):
 
     def setModelData(self, editor, model, index):
         cb = editor
-        model.setData(index, cb.currentText(), Qt.EditRole)
+        model.setData(index, cb.currentText(), Qt.ItemDataRole.EditRole)

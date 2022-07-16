@@ -3,18 +3,18 @@
 import os
 import h5py
 
-from qtpy.QtCore import (
+from PyQt6.QtCore import (
     Qt,
     QRect,
-    QSettings,
+    QSettings
 )
 
-from qtpy.QtGui import (
+from PyQt6.QtGui import (
     QKeySequence,
+    QAction
 )
 
-from qtpy.QtWidgets import (
-    QAction,
+from PyQt6.QtWidgets import (
     QDockWidget,
     QFileDialog,
     QMainWindow,
@@ -57,7 +57,7 @@ class MainWindow(QMainWindow):
         self.open_action = QAction(
             '&Open...',
             self,
-            shortcut=QKeySequence.Open,
+            shortcut=QKeySequence.StandardKey.Open,
             statusTip='Open file',
             triggered=self.handle_open_file,
         )
@@ -74,7 +74,7 @@ class MainWindow(QMainWindow):
         self.close_action = QAction(
             '&Close',
             self,
-            shortcut=QKeySequence.Close,
+            shortcut=QKeySequence.StandardKey.Close,
             statusTip='Close file',
             triggered=self.handle_close_file,
         )
@@ -91,7 +91,7 @@ class MainWindow(QMainWindow):
         self.quit_action = QAction(
             '&Quit',
             self,
-            shortcut=QKeySequence.Quit,
+            shortcut=QKeySequence.StandardKey.Quit,
             statusTip='Exit application',
             triggered=self.close,
         )
@@ -99,7 +99,7 @@ class MainWindow(QMainWindow):
         self.prefs_action = QAction(
             '&Preferences...',
             self,
-            shortcut=QKeySequence.Preferences,
+            shortcut=QKeySequence.StandardKey.Preferences,
             statusTip='Preferences',
             triggered=self.handle_open_prefs,
         )
@@ -173,10 +173,10 @@ class MainWindow(QMainWindow):
         self.dims_dock.setObjectName('dims_dock')
         self.dims_dock.setMinimumWidth(MIN_DOCK_WIDTH)
 
-        self.addDockWidget(Qt.LeftDockWidgetArea, self.tree_dock)
-        self.addDockWidget(Qt.RightDockWidgetArea, self.attrs_dock)
-        self.addDockWidget(Qt.RightDockWidgetArea, self.dataset_dock)
-        self.addDockWidget(Qt.RightDockWidgetArea, self.dims_dock)
+        self.addDockWidget(Qt.DockWidgetArea.LeftDockWidgetArea, self.tree_dock)
+        self.addDockWidget(Qt.DockWidgetArea.RightDockWidgetArea, self.attrs_dock)
+        self.addDockWidget(Qt.DockWidgetArea.RightDockWidgetArea, self.dataset_dock)
+        self.addDockWidget(Qt.DockWidgetArea.RightDockWidgetArea, self.dims_dock)
 
         self.view_menu.addActions([
             self.tree_dock.toggleViewAction(),
@@ -238,9 +238,9 @@ class MainWindow(QMainWindow):
 
         if geometry and not geometry.isEmpty():
             self.restoreGeometry(geometry)
-        else:
-            geometry = self.app.desktop().availableGeometry(self)
-            self.setGeometry(QRect(0, 0, geometry.width() * 0.8, geometry.height() * 0.7))
+        # else:
+        #     geometry = self.app.desktop().availableGeometry(self)
+        #     self.setGeometry(QRect(0, 0, geometry.width() * 0.8, geometry.height() * 0.7))
 
         # Restore the window state
         window_state = settings.value('windowState')
@@ -315,13 +315,12 @@ class MainWindow(QMainWindow):
         """
         Open a file
         """
-        options = QFileDialog.Options()
+
         filename, _ = QFileDialog.getOpenFileName(
             self,
             'QFileDialog.getOpenFileName()',
             '',
-            'HDF5 Files (*.hdf *.h5 *.hdf5)',
-            options=options
+            'HDF5 Files (*.hdf *.h5 *.hdf5)'
         )
 
         if filename:

@@ -30,16 +30,15 @@ setup(
     packages=find_packages('.'),
     install_requires=[
         'h5py',
-        # 'PyQt5',  # Install PyQt5 Qt bindings
-        # 'PySide2',  # Install PySide2 Qt bindings
-        'QtPy',   # Abstraction layer on top of Qt bindings for swapping between PyQt and Pyside2
+        'PyQt6'
     ],
     zip_safe=False,
     include_package_data=True,
     package_data={
+        'hdf5view': [
+            'resources'
+        ]
     },
-    data_files=(
-    ),
     entry_points={
         'gui_scripts': [
             'hdf5view=hdf5view.main:main',

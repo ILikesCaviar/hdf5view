@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 
-from qtpy.QtCore import (
+from PyQt6.QtCore import (
     Qt,
 )
 
-from qtpy.QtWidgets import (
+from PyQt6.QtWidgets import (
     QAbstractItemView,
     QHeaderView,
     QTableView,
@@ -41,26 +41,26 @@ class HDF5Widget(QWidget):
 
         # Set up the main file tree view
         self.tree_view = QTreeView(headerHidden=False)
-        self.tree_view.setSelectionBehavior(QAbstractItemView.SelectRows)
-        self.tree_view.setEditTriggers(QAbstractItemView.NoEditTriggers)
+        self.tree_view.setSelectionBehavior(QAbstractItemView.SelectionBehavior.SelectRows)
+        self.tree_view.setEditTriggers(QAbstractItemView.EditTrigger.NoEditTriggers)
         self.tree_view.setModel(self.tree_model)
 
-        self.tree_view.header().setSectionResizeMode(0, QHeaderView.Interactive)
+        self.tree_view.header().setSectionResizeMode(0, QHeaderView.ResizeMode.Interactive)
         self.tree_view.header().resizeSection(0, 160)
-        self.tree_view.header().setSectionResizeMode(1, QHeaderView.ResizeToContents)
+        self.tree_view.header().setSectionResizeMode(1, QHeaderView.ResizeMode.ResizeToContents)
         self.tree_view.header().setStretchLastSection(True)
 
         # Setup attributes table view
         self.attrs_view = QTableView()
         self.attrs_view.setModel(self.attrs_model)
-        self.attrs_view.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
+        self.attrs_view.horizontalHeader().setSectionResizeMode(QHeaderView.ResizeMode.Stretch)
         self.attrs_view.horizontalHeader().setStretchLastSection(True)
         self.attrs_view.verticalHeader().hide()
 
         # Setup dataset table view
         self.dataset_view = QTableView()
         self.dataset_view.setModel(self.dataset_model)
-        self.dataset_view.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
+        self.dataset_view.horizontalHeader().setSectionResizeMode(QHeaderView.ResizeMode.Stretch)
         self.dataset_view.horizontalHeader().setStretchLastSection(True)
         self.dataset_view.verticalHeader().hide()
 
@@ -68,7 +68,7 @@ class HDF5Widget(QWidget):
         self.dims_view = QTableView()
 
         self.dims_view.setModel(self.dims_model)
-        self.dims_view.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
+        self.dims_view.horizontalHeader().setSectionResizeMode(QHeaderView.ResizeMode.Stretch)
         self.dims_view.horizontalHeader().setStretchLastSection(True)
         self.dims_view.verticalHeader().hide()
 
@@ -125,7 +125,7 @@ class HDF5Widget(QWidget):
         """
         index = selected.indexes()[0]
 
-        path = self.tree_model.itemFromIndex(index).data(Qt.UserRole)
+        path = self.tree_model.itemFromIndex(index).data(Qt.ItemDataRole.UserRole)
 
         self.attrs_model.update_node(path)
         self.attrs_view.scrollToTop()
